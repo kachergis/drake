@@ -11,7 +11,7 @@ drake_eq <- function(R, fp, ne, fl, fi, fc, L) {
     return(expected_num_civs)
 }
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- fluidPage(
     # Application title
     titlePanel("Drake Equation: How many communicating intelligent civilizations might there be in our galaxy?"),
@@ -62,7 +62,7 @@ ui <- fluidPage(
     )
 )
 
-# Define server logic required to draw a histogram
+# Define server logic 
 server <- function(input, output) {
     get_drake = reactive({
         drake_eq(input$R, input$fp, input$ne, input$fl, input$fi, input$fc, input$L)
@@ -82,18 +82,19 @@ server <- function(input, output) {
     
     output$distPlot <- renderPlot({
         civdist = get_drake_distro()
-        #civdist = civdist[which(civdist>0)]
+        civdist[which(civdist<0)] = 0 # can't have negative civilizations
         hist(civdist, col = 'darkgray', border = 'white', xlab="Number of Civilizations", 
              main="Distribution of # of Broadcasting Civilizations in 10,000 Simulated Universes", 
              freq=T) #  , xlim=c(0,1000)
-        abline(v=mean(civdist), lty="dotted")
+        abline(v=median(civdist), lty="dotted")
+        text(x=(median(civdist)+3), y=5000, paste("Median:\n",round(median(civdist))))
         print(mean(civdist))
         #ggplot() + geom_histogram(data = civdist, aes(x = )) + geom_hline(x=mean(civdist))
     })
     
     output$probMoreThanUs <- renderText({
         civdist = get_drake_distro()
-        paste("In this simulation, the probability that there is more than one communicating civilization out there is ", round(sum(civdist>1)/length(civdist),2), ".",sep='')
+        paste("In this simulation, the probability that there is more than one communicating civilization in our galaxy is ", round(sum(civdist>1)/length(civdist),2), ".",sep='')
     })
     
     output$printDrakeEqn <- renderText({ 

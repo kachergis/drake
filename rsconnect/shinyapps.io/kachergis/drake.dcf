@@ -1,0 +1,12 @@
+name: drake
+title: drake
+username:
+account: kachergis
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1435102
+bundleId: 2570023
+url: https://kachergis.shinyapps.io/drake/
+when: 1573089555.34627
+asMultiple: FALSE
+asStatic: FALSE
