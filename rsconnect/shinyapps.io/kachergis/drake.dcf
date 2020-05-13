@@ -5,8 +5,8 @@ account: kachergis
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 1435102
-bundleId: 2570023
+bundleId: 3144470
 url: https://kachergis.shinyapps.io/drake/
-when: 1573089555.34627
+when: 1589410278.10883
 asMultiple: FALSE
 asStatic: FALSE
