@@ -20,6 +20,7 @@
 
 library(shiny)
 library(truncnorm)
+library(shinythemes)
 
 drake_eq <- function(R, fp, ne, fl, fi, fc, L) {
     expected_num_civs = R*fp*ne*fl*fi*fc*L
@@ -28,8 +29,10 @@ drake_eq <- function(R, fp, ne, fl, fi, fc, L) {
 
 # Define UI for application
 ui <- fluidPage(
+    theme = shinytheme("cyborg"),
     # Application title
-    titlePanel("Drake Equation: How many communicating intelligent civilizations might there be in our galaxy?"),
+    titlePanel("The Drake Equation"),
+    h3("How many communicating intelligent civilizations might there be in our galaxy?"),
     # Sidebar with a slider input for number of bins 
     withMathJax(),
     tags$div(HTML("<script type='text/x-mathjax-config' >
@@ -69,10 +72,14 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
            withMathJax(),
-           textOutput("printDrakeEqn"),
-           textOutput("expectedComCivs"),
+           tags$b(textOutput("printDrakeEqn")),
+           tags$b(textOutput("expectedComCivs")),
+           br(),
+           tags$b(textOutput("explainSimulation")),
+           br(),
            plotOutput("distPlot"),
-           textOutput("probMoreThanUs")
+           br(),
+           tags$b(textOutput("probMoreThanUs"))
         )
     )
 )
@@ -98,29 +105,37 @@ server <- function(input, output) {
     
     output$distPlot <- renderPlot({
         civdist = get_drake_distro()
-        civdist[which(civdist<0)] = 0 # can't have negative civilizations
-        hist(civdist, col = 'darkgray', border = 'white', xlab="Number of Civilizations", 
+        par(bg='black')
+        hist(civdist, col = 'darkgray', border = 'black', xlab="Number of Civilizations", 
              main="Distribution of Broadcasting Civilizations in 10,000 Simulations", 
-             freq=T) #  , xlim=c(0,1000)
-        abline(v=median(civdist), lty="dotted")
+             freq=T, col.lab="white", col.main="white", col.axis="white") #  , xlim=c(0,1000)
+        abline(v=median(civdist), lty="dotted", col="yellow")
         #text(x=(median(civdist)+20), y=200, paste("Median:\n",round(median(civdist))))
         abline(v=mean(civdist), lty="dashed", col="red")
         #text(x=(mean(civdist)+40), y=400, paste("Mean:\n",round(mean(civdist))), col="red")
         legend("topright",c(paste("Median =",round(median(civdist))),
                             paste("Mean =",round(mean(civdist)))),
-               lty = c("dotted", "dashed"), col=c("black", "red"))
+               lty = c("dotted", "dashed"), col=c("yellow", "red"), text.col="white")
         print(mean(civdist))
         #ggplot() + geom_histogram(data = civdist, aes(x = )) + geom_hline(x=mean(civdist))
     })
     
     output$probMoreThanUs <- renderText({
         civdist = get_drake_distro()
-        paste("In this simulation, the probability that there is more than one communicating civilization in our galaxy is ", 
-              round(sum(civdist>1)/length(civdist),2), ".",sep='')
+        paste("In this simulation, there is a ", 100*round(sum(civdist>1)/length(civdist),2), 
+              "% chance that humans are not alone in the Milky Way. ",
+              "On average, there are ", round(mean(civdist)), 
+              " communicationg intelligent civilizations. ", 
+              "Of course, there are ~250 billion stars in our galaxy, so these are still needles in a large haystack.", 
+              sep='')
     })
     
     output$printDrakeEqn <- renderText({ 
-        paste("The Drake equation gives the expected number of communicating intelligent civilizations in the Milky Way Galaxy: $N = R*f_p*n_e*f_l*f_i*f_c*L = $") 
+        paste("By the original Drake equation using the parameters at left, the expected number of communicating intelligent civilizations in the Milky Way Galaxy is $N = R*f_p*n_e*f_l*f_i*f_c*L = $") 
+    })
+    
+    output$explainSimulation <- renderText({
+        paste("Using the same equation and parameters in 10,000 simulated universes, we see the below distribution of different numbers of civilizations.")
     })
     
     output$expectedComCivs <- renderText({ 
